@@ -34,7 +34,15 @@ A tiny, doodly list app for groceries, wishlists, to-dos and anything else. It's
 - **Auto stickers:** small line icons appear on items like eggs, milk, fruit, coffee, books and gifts.
 - **Reduced motion:** turns the animations off when your device asks for less motion.
 
-Lists are saved in your browser (localStorage), so each device keeps its own lists.
+- **Installable:** it's a PWA, so you can add it to your home screen and it opens full-screen like a normal app, even offline.
+
+Lists are saved on your device (localStorage), so each device keeps its own lists.
+
+## Install on your phone
+
+- **iPhone (Safari):** open the site, tap **Share**, then **Add to Home Screen**.
+- **Android (Chrome):** open the site, tap the **⋮** menu, then **Install app** (or **Add to Home screen**).
+- **Desktop (Chrome / Edge):** click the install icon in the address bar.
 
 ## Tech
 
@@ -45,6 +53,7 @@ Plain HTML, CSS and JavaScript, with no framework and no build step.
 | `index.html` | Page shell, fonts and the wobbly-line SVG filter |
 | `style.css` | Look, layout and animations |
 | `app.js` | Doodles, mascot, screens and saving |
+| `manifest.webmanifest`, `sw.js`, `icons/` | Home-screen install and offline support |
 
 ## Run locally
 

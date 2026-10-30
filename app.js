@@ -687,5 +687,10 @@
   tick();
   setInterval(tick, 30000);
 
+  // installable + offline (see sw.js)
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+  }
+
   render();
 })();
