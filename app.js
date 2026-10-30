@@ -147,7 +147,38 @@
     </svg>`;
 
   // tiny line stickers picked from what you type
+  // order matters: the first row that matches wins, so specific/silly ones go first
   const STICKERS = [
+    ['poop|poo\\b|pee\\b|bathroom|loo\\b|number two|fart',
+      '<path d="M6 19h12c2 0 2.5-3 .5-3.5 1-2-.5-3.5-2.5-3.5.5-2-1-3.5-3-3.5.5-1.5-.5-3-2-3.5.5 1.5-.5 2.5-2 3-2 .5-2.5 2.5-1.5 4-2 0-3.5 1.5-2.5 3.5C4 16 4 19 6 19z M10.5 16.5q1.5 1 3 0"/><circle cx="10" cy="14.3" r=".7"/><circle cx="14" cy="14.3" r=".7"/>'],
+    ['cat\\b|cats|kitty|dog|puppy|pet\\b|pets|vet\\b|litter|feed\\b',
+      '<circle cx="12" cy="15.5" r="3.5"/><circle cx="6.5" cy="11" r="1.6"/><circle cx="9.8" cy="7.2" r="1.6"/><circle cx="14.2" cy="7.2" r="1.6"/><circle cx="17.5" cy="11" r="1.6"/>'],
+    ['plant|garden|flower|repot|succulent|grass',
+      '<path d="M7 14h10l-1.5 7h-7z M12 14V9 M12 11c-3 0-5-2-5-5 3 0 5 2 5 5z M12 10c0-3 2-5 5-5 0 3-2 5-5 5z"/>'],
+    ['trash|bin\\b|bins|rubbish|garbage|recycl',
+      '<path d="M5 7h14 M9.5 7V4h5v3 M7 7l1 13h8l1-13 M10.5 11v6 M13.5 11v6"/>'],
+    ['workout|work out|gym|lift|weights|dumbbell|exercise|squat|push.?up|pull.?up|abs\\b|core\\b|plank|pilates|crunch|leg day',
+      '<path d="M3 10v4 M6 7v10 M18 7v10 M21 10v4 M6 12h12"/>'],
+    ['run\\b|running|jog|walk|steps|cardio|hike|marathon|5k|10k',
+      '<path d="M3 17c0-3 1-7 3-8l3 2 4-1c2 3 6 4 8 5v2H3z M3 20h18 M10 12l1 2 M13 11.5l1 2"/>'],
+    ['yoga|stretch|meditat|breathe|mindful|relax|self.?care',
+      '<path d="M12 19c-4 0-8-2-9-5 3 0 6 1 9 5 3-4 6-5 9-5-1 3-5 5-9 5z M12 19c-2-3-2-7 0-11 2 4 2 8 0 11z"/>'],
+    ['sleep|nap\\b|naps|bed\\b|bedtime|rest\\b|snooze|zz',
+      '<path d="M14 5a7.5 7.5 0 1 0 5.5 12.5A6.5 6.5 0 0 1 14 5z M16 3h4l-4 4h4"/>'],
+    ['shower|bath\\b|bathe|bubble bath',
+      '<path d="M5 21V8a4 4 0 0 1 8 0 M9.5 8h7 M11 12v1 M14 12v1 M17 12v1 M12.5 15v1 M15.5 15v1 M14 18v1"/>'],
+    ['meds|medicine|medication|pill|vitamin|supplement|doctor|dentist|clinic|appointment',
+      '<path d="M4.5 19.5a3.5 3.5 0 0 1 0-5l10-10a3.5 3.5 0 0 1 5 5l-10 10a3.5 3.5 0 0 1-5 0z M9.5 9.5l5 5"/>'],
+    ['study|homework|assignment|essay|exam|revise|revision|write|email|work\\b|lecture|class',
+      '<path d="M4 20l1-4L16 5l3 3L8 19z M14 7l3 3"/>'],
+    ['pay\\b|bill|rent\\b|bank|budget|money|save|tax|invoice',
+      '<circle cx="12" cy="12" r="8.5"/><path d="M12 7v10 M14.5 9.5c-1-1-5-1-5 1s5 1 5 3-4 2-5 1"/>'],
+    ['dance|party|karaoke|sing\\b|singing|music|concert|playlist',
+      '<path d="M9 17V6l10-2v11 M9 17a2.5 2 0 1 1-5 0 2.5 2 0 0 1 5 0z M19 15a2.5 2 0 1 1-5 0 2.5 2 0 0 1 5 0z"/>'],
+    ['phone|scroll|doomscroll|tiktok|instagram|text\\b|reply',
+      '<path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z M11 18h2"/>'],
+    ['cook|bake\\b|baking|meal|dinner|lunch|breakfast|recipe',
+      '<path d="M3 11h12v2a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z M15 12h6 M7 8c0-1.5 1.5-1.5 1.5-3 M11 8c0-1.5 1.5-1.5 1.5-3"/>'],
     ['coconut', '<circle cx="12" cy="12.5" r="8"/><circle cx="9.5" cy="10" r=".9"/><circle cx="14.5" cy="10" r=".9"/><circle cx="12" cy="13.5" r=".9"/><path d="M6.5 17l1.5-1 M17.5 17l-1.5-1"/>'],
     ['corn', '<path d="M12 3c3 0 4 4 4 9s-2 7-4 7-4-2-4-7 1-9 4-9z M10 8h4 M9.5 12h5 M10 16h4 M8 13c-3 2-4 5-3 8 3 0 5-1 7-2 M16 13c3 2 4 5 3 8-3 0-5-1-7-2"/>'],
     ['meat|chicken|beef|pork|steak|mince|bacon|ham|sausage|lamb|turkey|wing|drumstick|bbq',
@@ -176,6 +207,8 @@
     ['trip|travel|flight|plane|ticket|holiday|vacation|pack', '<path d="M3 12l18-8-6 16-3-7z M12 13l9-9"/>'],
     ['movie|film|show|netflix|series|drama|anime', '<path d="M4 5h16v14H4z M4 9h16 M4 15h16 M8 5v4 M16 5v4 M8 15v4 M16 15v4"/>'],
     ['love|date|mom|mum|dad|friend|call|hug', '<path d="M12 20l-7-7a4 4 0 0 1 7-5 4 4 0 0 1 7 5z"/>'],
+    // last, so "coconut water" and "water the plants" get their own icons first
+    ['water|hydrat|drink', '<path d="M12 3c3 4 6 8 6 11a6 6 0 0 1-12 0c0-3 3-7 6-11z"/>'],
   ].map(([words, path]) => [new RegExp('\\b(' + words + ')', 'i'), path]);
 
   const sticker = text => {
