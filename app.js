@@ -476,7 +476,7 @@
           </div>`;
         }).join('')}
 
-        <button class="new-group" data-action="add-sec">+ add a group <span style="color:var(--muted)">(like “dairy” or “birthday”)</span></button>
+        <button class="new-group" data-action="add-sec">+ add a group</button>
         <div class="list-foot">
           <button class="text-btn" data-action="clear-done" ${done ? '' : 'disabled style="opacity:.4"'}>Clear ticked</button>
           <button class="text-btn danger" data-action="del-list">Delete list</button>
