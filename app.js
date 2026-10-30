@@ -148,6 +148,16 @@
 
   // tiny line stickers picked from what you type
   const STICKERS = [
+    ['coconut', '<circle cx="12" cy="12.5" r="8"/><circle cx="9.5" cy="10" r=".9"/><circle cx="14.5" cy="10" r=".9"/><circle cx="12" cy="13.5" r=".9"/><path d="M6.5 17l1.5-1 M17.5 17l-1.5-1"/>'],
+    ['corn', '<path d="M12 3c3 0 4 4 4 9s-2 7-4 7-4-2-4-7 1-9 4-9z M10 8h4 M9.5 12h5 M10 16h4 M8 13c-3 2-4 5-3 8 3 0 5-1 7-2 M16 13c3 2 4 5 3 8-3 0-5-1-7-2"/>'],
+    ['meat|chicken|beef|pork|steak|mince|bacon|ham|sausage|lamb|turkey|wing|drumstick|bbq',
+      '<path d="M10 14c-3-3-2-10 4-11s9 4 7 8-8 6-11 3z M10.5 13.5l-4.5 4.5"/><circle cx="4.3" cy="17.6" r="1.9"/><circle cx="6.4" cy="19.7" r="1.9"/>'],
+    ['rice|noodle|pasta|ramen|ramyeon|spaghetti|udon|cereal|oat|soup|kimchi|tteok',
+      '<path d="M3 12h18c0 5-4 8-9 8s-9-3-9-8z M14 9l6-6 M16 10l6-4"/>'],
+    ['soap|shampoo|conditioner|body|lotion|tooth|floss|deodorant|sunscreen|skincare|cleanser|sanitis|sanitiz|detergent|bleach|razor',
+      '<path d="M5 13h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2z"/><circle cx="8" cy="8" r="2"/><circle cx="14" cy="5" r="1.5"/><circle cx="17" cy="9.5" r="1.2"/>'],
+    ['toilet|tissue|paper towel|napkin|wipe|diaper|nappy|pads|tampon',
+      '<path d="M8 4h9c2 0 3 3 3 7s-1 7-3 7H8 M8 4c-2 0-3 3-3 7s1 7 3 7 3-3 3-7-1-7-3-7z M17 18v3h-6"/><circle cx="8" cy="11" r="1"/>'],
     ['apple|banana|fruit|berr|strawberr|orange|grape|peach|pear|lemon|lime|melon|mango|cherr|kiwi',
       '<path d="M12 7c-3-2-7 0-7 5s3 9 5 9c1 0 1.5-.5 2-.5s1 .5 2 .5c2 0 5-4 5-9s-4-7-7-5z M12 7c0-2 1-4 3-4"/>'],
     ['egg', '<path d="M12 3c-4 0-7 7-7 11a7 7 0 0 0 14 0c0-4-3-11-7-11z"/>'],

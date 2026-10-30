@@ -456,6 +456,7 @@ h1, h2, h3 { font-family: var(--hand); font-weight: 400; margin: 0; line-height:
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
 }
+.item:not(.done) .scribble { display: none; }
 .item.done .scribble path { stroke-dashoffset: 0; }
 .item.done.just .scribble path { animation: draw .4s ease-out .08s backwards; }
 @keyframes draw { from { stroke-dashoffset: 100; } }
