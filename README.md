@@ -4,6 +4,25 @@ A tiny, doodly list app for groceries, wishlists, to-dos and anything else. It's
 
 **Live:** https://scribble-lists.vercel.app
 
+<p align="center">
+  <img src="screenshots/0-desktop.png" alt="Scribble Lists home screen in a phone frame on desktop" width="760">
+</p>
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/1-welcome.png" alt="Welcome screen" width="220"><br><sub>Welcome</sub></td>
+    <td align="center"><img src="screenshots/2-name.png" alt="Name step" width="220"><br><sub>What's your name?</sub></td>
+    <td align="center"><img src="screenshots/3-kind.png" alt="Choosing a list type" width="220"><br><sub>Pick a list type</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="screenshots/4-home.png" alt="Home screen with lists grouped by type" width="220"><br><sub>Lists, grouped by type</sub></td>
+    <td align="center"><img src="screenshots/5-list.png" alt="A grocery list with groups, scribbled-out items and stickers" width="220"><br><sub>Groups, scribbles &amp; stickers</sub></td>
+    <td align="center"><img src="screenshots/6-done.png" alt="Finishing a list with sparkles and a mascot toast" width="220"><br><sub>All done celebration</sub></td>
+  </tr>
+</table>
+
 ## Features
 
 - **Lists by type:** Groceries, Wishlist, To-do or Anything. The home screen groups your lists by type, and you can filter them.
