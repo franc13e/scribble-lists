@@ -104,12 +104,12 @@
         <path d="M100 130 q6 3 12 0"/>
         <path class="float" d="M30 20 c-10 0 -12 14 -2 16 c-6 10 10 18 16 8 c10 6 20 -6 12 -14 c4 -10 -10 -16 -16 -8 c-2 -4 -6 -4 -10 -2"/>
         <path class="float" d="M166 104 c-8 -2 -12 10 -4 14 c-2 8 10 12 14 4 c8 2 12 -8 6 -12 c2 -8 -8 -12 -12 -6"/>
-        <path class="wig" d="M168 36 v32 M178 30 v40 M188 34 v34 M162 36 h34 l4 -14 l-6 -8"/>
+        <path class="bob" d="M150 26 h42 a10 10 0 0 1 10 10 v22 a10 10 0 0 1 -10 10 h-24 l-12 12 l2 -12 h-8 a10 10 0 0 1 -10 -10 v-22 a10 10 0 0 1 10 -10 z"/>
         <path class="tw" d="M56 22 l8 8 M64 22 l-8 8"/>
         <path class="tw d1" d="M116 22 l8 8 M124 22 l-8 8"/>
-        <path class="tw d2" d="M150 74 l7 7 M157 74 l-7 7"/>
         <path class="tw" d="M20 96 l7 7 M27 96 l-7 7"/>
-      </g>`),
+      </g>
+      <text class="bob" x="171" y="56" text-anchor="middle" font-family="Gochi Hand, cursive" font-size="24" fill="currentColor">hi!</text>`),
 
     ready: svg(`
       <g ${S}>
@@ -237,7 +237,19 @@
 
   const NOTES = ['drink some water ♡', 'one thing at a time', 'you’re doing great', 'don’t forget snacks',
     'small steps count ✿', 'take a little break', 'hi hi!', 'proud of you'];
-  const DONE = ['you did it! ✿', 'all done ♡', 'look at you go!', 'list cleared, yay'];
+  // what the mascot says when a list is finished, per list type
+  const DONE = {
+    grocery: ['basket complete ✿', 'all shopped ♡', 'groceries done, yay'],
+    wish: ['every wish granted ✿', 'all yours now ♡', 'wishes do come true!'],
+    todo: ['you did it! ✿', 'all done ♡', 'look at you go!'],
+    other: ['all done ♡', 'list cleared, yay', 'look at you go!'],
+  };
+  const ALL_DONE = {
+    grocery: 'all in the basket ✿',
+    wish: 'every wish granted ✿',
+    todo: 'all done! go treat yourself ✿',
+    other: 'all done! ✿',
+  };
   const pick = (arr, not) => {
     const pool = arr.filter(x => x !== not);
     return pool[Math.floor(Math.random() * pool.length)];
@@ -277,6 +289,9 @@
   let justAdded = null;       // item id to pop in
   let justToggled = null;     // item id to animate its tick
   let hop = false;            // make the buddy hop after the next render
+  let sheet = null;           // item id whose repeat sheet is open
+  let sheetFresh = false;     // slide the sheet in only when it first opens
+  let leroArmed = true;       // easter egg fires once per time it's typed
 
   const esc = s => String(s).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -336,7 +351,7 @@
           <form data-form="name">
             <p class="question">${state.lists.length ? 'What is your new list called?' : 'What should your first list be called?'}</p>
             <input class="field" name="name" maxlength="40" autocomplete="off"
-              placeholder="weekly shop" value="${esc(draft.name)}">
+              value="${esc(draft.name)}">
           </form>
           <div class="spacer"></div>
           <div class="nav">
@@ -412,7 +427,10 @@
       <section class="screen">
         <div class="home-head">
           <div>
-            <button class="hello" data-action="edit-name">${hello}${state.user ? ', ' + esc(state.user) : ''} ✿</button>
+            <div class="hello-row">
+              <button class="hello" data-action="edit-name">${hello}${state.user ? ', ' + esc(state.user) : ''} ✿</button>
+              <button class="icon-btn snd" data-action="sound" aria-label="Sound ${state.sound === false ? 'off' : 'on'}" title="Sound">${state.sound === false ? SPEAKER_OFF : SPEAKER_ON}</button>
+            </div>
             <h1 class="home-title">your lists</h1>
           </div>
           <button class="buddy" data-action="poke" aria-label="Say hi">
@@ -447,7 +465,7 @@
           </div>
         </div>
         <div class="progress-row">
-          <p class="progress-line">${!total ? 'nothing here… yet' : allDone ? 'all done! go treat yourself ✿' : `${done} of ${total} ticked off`}</p>
+          <p class="progress-line">${!total ? 'nothing here… yet' : allDone ? ALL_DONE[k.id] : `${done} of ${total} ticked off`}</p>
           <span class="buddy sm">${mascot(allDone)}</span>
         </div>
 
@@ -464,8 +482,8 @@
               ${s.items.map(i => `
                 <li class="item ${i.done ? 'done' : ''} ${i.id === justAdded ? 'new' : ''} ${i.id === justToggled ? 'just' : ''}" data-item="${i.id}">
                   <button class="check" data-action="toggle" aria-label="${i.done ? 'Untick' : 'Tick'} ${esc(i.text)}">${CHECK}</button>
-                  <button class="item-text" data-action="toggle"><span class="txt">${esc(i.text)}${SCRIBBLE}</span>${sticker(i.text)}${repeatTag(i)}</button>
-                  <button class="icon-btn rep ${i.repeat ? 'on' : ''}" data-action="repeat" title="Repeat: ${i.repeat || 'off'}" aria-label="Repeat ${esc(i.text)}: ${i.repeat || 'off'}">${LOOP}</button>
+                  <button class="item-text" data-action="toggle"><span class="txt">${esc(i.text)}${SCRIBBLE}</span>${sticker(i.text)}${repeatTag(l, i)}</button>
+                  ${k.id === 'wish' ? '' : `<button class="icon-btn rep ${repeats(l, i) ? 'on' : ''}" data-action="repeat" title="Repeat" aria-label="Repeat ${esc(i.text)}: ${repeats(l, i) ? repeatLabel(i) : 'off'}">${LOOP}</button>`}
                   <button class="icon-btn" data-action="del-item" aria-label="Delete ${esc(i.text)}">×</button>
                 </li>`).join('')}
             </ul>
@@ -481,7 +499,31 @@
           <button class="text-btn" data-action="clear-done" ${done ? '' : 'disabled style="opacity:.4"'}>Clear ticked</button>
           <button class="text-btn danger" data-action="del-list">Delete list</button>
         </div>
-      </section>`;
+      </section>
+      ${sheet ? sheetView(l) : ''}`;
+  }
+
+  function sheetView(l) {
+    const i = findItem(l, sheet);
+    if (!i) return '';
+    const days = i.repeat === 'days' ? i.days : [];
+    return `
+      <div class="sheet-wrap ${sheetFresh ? 'fresh' : ''}">
+        <div class="sheet-backdrop" data-action="sheet-close"></div>
+        <div class="sheet" role="dialog" aria-label="Repeat ${esc(i.text)}">
+          <h3>repeat “${esc(i.text)}”</h3>
+          <div class="rep-opts">
+            ${REPEAT_OPTS.map(([v, label]) => `
+              <button class="chip ${(i.repeat || null) === v ? 'on' : ''}" data-action="set-repeat" data-rep="${v || ''}">${label}</button>`).join('')}
+          </div>
+          <p class="sheet-label">or only on certain days</p>
+          <div class="days">
+            ${WEEK.map(d => `
+              <button class="day ${days.includes(d) ? 'on' : ''}" data-action="toggle-day" data-day="${d}" aria-label="${DAY_NAMES[d]}">${DAY_NAMES[d][0]}</button>`).join('')}
+          </div>
+          <button class="pill wide" data-action="sheet-close">Done</button>
+        </div>
+      </div>`;
   }
 
   // ---------- render ----------
@@ -489,35 +531,81 @@
   const app = document.getElementById('app');
 
   // ---------- repeating items ----------
-  // a ticked repeating item unticks itself once its day / week (from Monday) / month is over
+  // item.repeat: 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'days' (item.days = weekdays, Sun = 0)
+  // a ticked repeating item unticks itself when it's next due; wishlists never repeat
 
-  const REPEATS = [null, 'daily', 'weekly', 'monthly'];
-  const AGAIN = { daily: 'back tomorrow', weekly: 'back next week', monthly: 'back next month' };
+  const DAY = 864e5;
+  const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const WEEK = [1, 2, 3, 4, 5, 6, 0]; // Monday first
+  const REPEAT_OPTS = [[null, 'never'], ['daily', 'every day'], ['weekly', 'every week'],
+    ['biweekly', 'every 2 weeks'], ['monthly', 'every month']];
 
-  const periodStart = repeat => {
-    const d = new Date();
-    const s = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    if (repeat === 'weekly') s.setDate(s.getDate() - (s.getDay() + 6) % 7);
-    if (repeat === 'monthly') s.setDate(1);
-    return s.getTime();
+  const dayStart = (t, add = 0) => {
+    const d = new Date(t);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() + add).getTime();
   };
+
+  const repeats = (l, i) => l.kind !== 'wish' && !!i.repeat && (i.repeat !== 'days' || !!(i.days && i.days.length));
+
+  const findItem = (l, id) => {
+    for (const s of l.sections) {
+      const i = s.items.find(x => x.id === id);
+      if (i) return i;
+    }
+    return null;
+  };
+
+  // the day a ticked item comes back, counted from the day it was ticked
+  function nextDue(i) {
+    const done = dayStart(i.doneAt || 0);
+    const d = new Date(done);
+    switch (i.repeat) {
+      case 'daily': return dayStart(done, 1);
+      case 'weekly': return dayStart(done, 7 - (d.getDay() + 6) % 7); // next Monday
+      case 'biweekly': return dayStart(done, 14);
+      case 'monthly': return new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
+      case 'days':
+        for (let k = 1; k <= 7; k++) if (i.days.includes(new Date(dayStart(done, k)).getDay())) return dayStart(done, k);
+    }
+    return Infinity;
+  }
+
+  function repeatLabel(i) {
+    if (i.repeat === 'days') {
+      return i.days.length === 7 ? 'every day' : WEEK.filter(d => i.days.includes(d)).map(d => DAY_NAMES[d]).join(' · ');
+    }
+    return { daily: 'daily', weekly: 'weekly', biweekly: 'every 2 weeks', monthly: 'monthly' }[i.repeat];
+  }
+
+  function backLabel(i) {
+    const due = nextDue(i);
+    if (due === dayStart(Date.now(), 1)) return 'back tomorrow';
+    if (i.repeat === 'weekly') return 'back next week';
+    if (i.repeat === 'monthly') return 'back next month';
+    const d = new Date(due);
+    return due - dayStart(Date.now()) < 7 * DAY
+      ? `back ${DAY_NAMES[d.getDay()]}`
+      : `back ${d.getDate()} ${d.toLocaleString('en', { month: 'short' })}`;
+  }
 
   function resetRepeats() {
     let changed = false;
+    const now = Date.now();
     state.lists.forEach(l => l.sections.forEach(s => s.items.forEach(i => {
-      if (i.repeat && i.done && (i.doneAt || 0) < periodStart(i.repeat)) { i.done = false; changed = true; }
+      if (i.done && repeats(l, i) && now >= nextDue(i)) { i.done = false; changed = true; }
     })));
     if (changed) save();
     return changed;
   }
 
-  const repeatTag = i => i.repeat
-    ? `<span class="rep-tag">${i.done ? AGAIN[i.repeat] : i.repeat}</span>`
+  const repeatTag = (l, i) => repeats(l, i)
+    ? `<span class="rep-tag">${i.done ? backLabel(i) : repeatLabel(i)}</span>`
     : '';
 
   function render() {
     resetRepeats();
     const r = route();
+    if (!r.startsWith('/list/')) sheet = null;
     let html;
     if (r.startsWith('/list/')) {
       const l = currentList();
@@ -538,6 +626,7 @@
 
     app.innerHTML = html;
     justAdded = justToggled = null;
+    sheetFresh = false;
 
     if (changed) {
       app.firstElementChild.classList.add('enter');
@@ -592,6 +681,110 @@
     setTimeout(() => t.remove(), 2600);
   }
 
+  // ---------- sounds ----------
+  // all synthesised with Web Audio, so there are no sound files to download
+
+  const SPEAKER = '<path d="M4 9h4l5-4v14l-5-4H4z"/>';
+  const icon24 = body => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+  const SPEAKER_ON = icon24(SPEAKER + '<path d="M16 9c1.5 1.5 1.5 4.5 0 6 M18.5 6.5c3 3 3 8 0 11"/>');
+  const SPEAKER_OFF = icon24(SPEAKER + '<path d="M17 9.5l5 5 M22 9.5l-5 5"/>');
+
+  let actx = null;
+  let noise = null;
+
+  function audio() {
+    if (state.sound === false) return null;
+    const C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return null;
+    if (!actx) {
+      actx = new C();
+      noise = actx.createBuffer(1, actx.sampleRate, actx.sampleRate);
+      const d = noise.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (actx.state === 'suspended') actx.resume();
+    return actx;
+  }
+
+  // one soft note; f is a frequency, or [from, to] to slide
+  function tone(c, f, at, dur, vol = .15, type = 'sine') {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    const t = c.currentTime + at;
+    const [a, b] = Array.isArray(f) ? f : [f, f];
+    o.type = type;
+    o.frequency.setValueAtTime(a, t);
+    if (b !== a) o.frequency.exponentialRampToValueAtTime(b, t + dur * .8);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + .01);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g).connect(c.destination);
+    o.start(t);
+    o.stop(t + dur + .02);
+  }
+
+  // filtered noise: a pencil stroke on paper, or a soft poof
+  function hiss(c, at, dur, vol, type, from, to) {
+    const s = c.createBufferSource();
+    const f = c.createBiquadFilter();
+    const g = c.createGain();
+    const t = c.currentTime + at;
+    s.buffer = noise;
+    f.type = type;
+    f.Q.value = 1.4;
+    f.frequency.setValueAtTime(from, t);
+    f.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    s.connect(f).connect(g).connect(c.destination);
+    s.start(t, Math.random() * .5);
+    s.stop(t + dur + .02);
+  }
+
+  const SFX = {
+    // zig-zag of quick pencil strokes, matching the crayon scribble
+    scratch: c => { for (let k = 0; k < 4; k++) hiss(c, k * .065, .075, .55, 'bandpass', 2000 + Math.random() * 1500, 4000 + Math.random() * 1800); },
+    untick: c => tone(c, [520, 300], 0, .12, .12),
+    pop: c => tone(c, [420, 900], 0, .09, .14),
+    boing: c => { tone(c, [330, 800], 0, .12, .14); tone(c, [800, 520], .1, .2, .1); },
+    chime: c => [784, 988, 1175, 1568].forEach((f, k) => tone(c, f, .15 + k * .09, .5, .09, 'triangle')),
+    poof: c => hiss(c, 0, .24, .4, 'lowpass', 1500, 200),
+    tap: c => tone(c, 660, 0, .05, .06, 'triangle'),
+    ding: c => { tone(c, 880, 0, .12, .08, 'triangle'); tone(c, 1320, .07, .22, .08, 'triangle'); },
+  };
+
+  const sfx = name => {
+    const c = audio();
+    if (c) try { SFX[name](c); } catch (e) { /* audio is optional */ }
+  };
+
+  // ---------- easter egg ----------
+
+  function leroLero() {
+    if (document.activeElement) document.activeElement.blur(); // hide the phone keyboard
+    sfx('chime');
+    const w = document.createElement('div');
+    w.className = 'lero';
+    w.innerHTML = `
+      <div class="lero-box" role="dialog" aria-label="lero lero">
+        <div class="lero-head">
+          <span class="buddy sm">${mascot(true)}</span>
+          <b>lero lero ♪</b>
+          <button class="icon-btn" aria-label="Close">×</button>
+        </div>
+        <div class="lero-video">
+          <iframe src="https://www.youtube-nocookie.com/embed/nYMDFv5cKaA?autoplay=1&playsinline=1&rel=0"
+            title="lero lero" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+      </div>`;
+    w.addEventListener('click', e => {
+      if (e.target === w || e.target.closest('.icon-btn')) w.remove();
+    });
+    document.body.appendChild(w);
+  }
+
   const afterName = () => go(state.lists.length ? '/' : '/new');
 
   // ---------- events ----------
@@ -607,7 +800,9 @@
 
     switch (t.dataset.action) {
       case 'start':
-        state.seen = true; save(); go(state.user ? '/new' : '/hi'); break;
+        sfx('tap'); state.seen = true; save(); go(state.user ? '/new' : '/hi'); break;
+      case 'sound':
+        state.sound = state.sound === false; save(); sfx('ding'); render(); break;
       case 'edit-name':
         you = state.user || ''; go('/hi'); break;
       case 'you-back':
@@ -616,7 +811,7 @@
         break;
       case 'you-next':
         if (!you.trim()) return;
-        state.user = you.trim(); save(); afterName();
+        sfx('tap'); state.user = you.trim(); save(); afterName();
         break;
       case 'poke': {
         note = pick(NOTES, note);
@@ -625,22 +820,24 @@
         b.style.animation = 'none';
         void b.offsetWidth;
         b.style.animation = '';
+        sfx('boing');
         hopBuddy();
         break;
       }
       case 'new':
-        draft = null; go('/new'); break;
+        sfx('tap'); draft = null; go('/new'); break;
       case 'filter':
-        filter = t.dataset.kind; render(); break;
+        sfx('tap'); filter = t.dataset.kind; render(); break;
       case 'wiz-back':
         if (draft.step === 0) { draft = null; go(state.lists.length ? '/' : '/hi'); } else { draft.step--; render(); }
         break;
       case 'wiz-next':
         if (draft.step === 0 && !draft.name.trim()) return;
-        draft.step++; render(); break;
+        sfx('tap'); draft.step++; render(); break;
       case 'pick-kind':
-        draft.kind = t.dataset.kind; render(); break;
+        sfx('tap'); draft.kind = t.dataset.kind; render(); break;
       case 'create': {
+        sfx('pop');
         const k = kindOf(draft.kind);
         const l = {
           id: uid(), name: draft.name.trim(), kind: k.id, created: Date.now(),
@@ -664,22 +861,48 @@
         const { total, done } = stats(list);
         const finished = item.done && done === total;
         if (finished) hop = true;
+        sfx(item.done ? 'scratch' : 'untick');
+        if (finished) sfx('chime');
         render();
         if (item.done) burst(box.left + box.width / 2, box.top + box.height / 2, finished);
-        if (finished) toast(pick(DONE));
+        if (finished) toast(pick(DONE[kindOf(list.kind).id]));
         break;
       }
       case 'repeat':
         if (!item) return;
-        item.repeat = REPEATS[(REPEATS.indexOf(item.repeat || null) + 1) % REPEATS.length];
-        if (!item.repeat) delete item.repeat;
-        if (item.done && !item.doneAt) item.doneAt = Date.now();
-        save(); render();
+        sfx('tap');
+        sheet = item.id;
+        sheetFresh = true;
+        render();
         break;
+      case 'sheet-close':
+        sheet = null; render(); break;
+      case 'set-repeat': {
+        const it = findItem(list, sheet);
+        if (!it) return;
+        const v = t.dataset.rep || null;
+        if (v) it.repeat = v; else delete it.repeat;
+        delete it.days;
+        if (it.done && !it.doneAt) it.doneAt = Date.now();
+        sfx(v ? 'ding' : 'tap'); save(); render();
+        break;
+      }
+      case 'toggle-day': {
+        const it = findItem(list, sheet);
+        if (!it) return;
+        const d = +t.dataset.day;
+        const days = it.repeat === 'days' ? it.days.filter(x => x !== d) : [];
+        if (!(it.repeat === 'days' && it.days.includes(d))) days.push(d);
+        if (days.length) { it.repeat = 'days'; it.days = days; } else { delete it.repeat; delete it.days; }
+        if (it.done && !it.doneAt) it.doneAt = Date.now();
+        sfx('tap'); save(); render();
+        break;
+      }
       case 'del-item':
-        if (item) { sec.items = sec.items.filter(i => i !== item); save(); render(); }
+        if (item) { sfx('poof'); sec.items = sec.items.filter(i => i !== item); save(); render(); }
         break;
       case 'add-sec': {
+        sfx('pop');
         const s = { id: uid(), name: 'New group', items: [] };
         list.sections.push(s); save();
         pendingFocus = { sel: `[data-sec="${s.id}"] .group-name`, select: true };
@@ -688,15 +911,17 @@
       }
       case 'del-sec':
         if (sec.items.length && !confirm(`Remove “${sec.name}” and its ${sec.items.length} item(s)?`)) return;
-        list.sections = list.sections.filter(s => s !== sec); save(); render();
+        sfx('poof'); list.sections = list.sections.filter(s => s !== sec); save(); render();
         break;
       case 'clear-done':
         // repeating items stay; they untick themselves when it's time
-        list.sections.forEach(s => { s.items = s.items.filter(i => !i.done || i.repeat); });
+        sfx('poof');
+        list.sections.forEach(s => { s.items = s.items.filter(i => !i.done || repeats(list, i)); });
         save(); render();
         break;
       case 'del-list':
         if (!confirm(`Delete “${list.name}”? This can’t be undone.`)) return;
+        sfx('poof');
         state.lists = state.lists.filter(l => l !== list); save(); go('/');
         break;
     }
@@ -722,6 +947,7 @@
       const item = { id: uid(), text, done: false };
       sec.items.push(item);
       save();
+      sfx('pop');
       justAdded = item.id;
       hop = true;
       pendingFocus = `[data-sec="${secId}"] .add-row input`;
@@ -730,6 +956,13 @@
   });
 
   app.addEventListener('input', e => {
+    // typing "lero lero" anywhere, in any capitalisation
+    if (/lero\s*lero/i.test(e.target.value || '')) {
+      if (leroArmed) { leroArmed = false; leroLero(); }
+    } else {
+      leroArmed = true;
+    }
+
     const n = e.target.name;
     if (n === 'name' && draft) {
       draft.name = e.target.value;
@@ -759,6 +992,13 @@
   // Enter in a heading input just commits the rename
   app.addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.target.dataset.field) e.target.blur();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const egg = document.querySelector('.lero');
+    if (egg) egg.remove();
+    else if (sheet) { sheet = null; render(); }
   });
 
   window.addEventListener('hashchange', render);
