@@ -216,6 +216,9 @@
     return hit ? `<svg class="stk" viewBox="0 0 24 24" aria-hidden="true">${hit[1]}</svg>` : '';
   };
 
+  const LOOP = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l3 3-3 3 M20 6H9a5 5 0 0 0-5 5 M7 21l-3-3 3-3 M4 18h11a5 5 0 0 0 5-5"
+    fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
   const CHECK = `<svg viewBox="0 0 32 32" aria-hidden="true">
     <path class="ring" d="M17 3.6c7.2.3 12 5.8 11.6 12.7-.4 6.9-5.9 12-12.6 11.7C9 27.7 3.8 22.3 4 15.6 4.3 8.9 9.6 3.6 16.4 4.2"/>
     <path class="tick" d="M9 16.5l5.2 5.6L24.5 8.5"/></svg>`;
@@ -461,7 +464,8 @@
               ${s.items.map(i => `
                 <li class="item ${i.done ? 'done' : ''} ${i.id === justAdded ? 'new' : ''} ${i.id === justToggled ? 'just' : ''}" data-item="${i.id}">
                   <button class="check" data-action="toggle" aria-label="${i.done ? 'Untick' : 'Tick'} ${esc(i.text)}">${CHECK}</button>
-                  <button class="item-text" data-action="toggle"><span class="txt">${esc(i.text)}${SCRIBBLE}</span>${sticker(i.text)}</button>
+                  <button class="item-text" data-action="toggle"><span class="txt">${esc(i.text)}${SCRIBBLE}</span>${sticker(i.text)}${repeatTag(i)}</button>
+                  <button class="icon-btn rep ${i.repeat ? 'on' : ''}" data-action="repeat" title="Repeat: ${i.repeat || 'off'}" aria-label="Repeat ${esc(i.text)}: ${i.repeat || 'off'}">${LOOP}</button>
                   <button class="icon-btn" data-action="del-item" aria-label="Delete ${esc(i.text)}">×</button>
                 </li>`).join('')}
             </ul>
@@ -484,7 +488,35 @@
 
   const app = document.getElementById('app');
 
+  // ---------- repeating items ----------
+  // a ticked repeating item unticks itself once its day / week (from Monday) / month is over
+
+  const REPEATS = [null, 'daily', 'weekly', 'monthly'];
+  const AGAIN = { daily: 'back tomorrow', weekly: 'back next week', monthly: 'back next month' };
+
+  const periodStart = repeat => {
+    const d = new Date();
+    const s = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if (repeat === 'weekly') s.setDate(s.getDate() - (s.getDay() + 6) % 7);
+    if (repeat === 'monthly') s.setDate(1);
+    return s.getTime();
+  };
+
+  function resetRepeats() {
+    let changed = false;
+    state.lists.forEach(l => l.sections.forEach(s => s.items.forEach(i => {
+      if (i.repeat && i.done && (i.doneAt || 0) < periodStart(i.repeat)) { i.done = false; changed = true; }
+    })));
+    if (changed) save();
+    return changed;
+  }
+
+  const repeatTag = i => i.repeat
+    ? `<span class="rep-tag">${i.done ? AGAIN[i.repeat] : i.repeat}</span>`
+    : '';
+
   function render() {
+    resetRepeats();
     const r = route();
     let html;
     if (r.startsWith('/list/')) {
@@ -626,6 +658,7 @@
         if (!item) return;
         const box = itemEl.querySelector('.check').getBoundingClientRect();
         item.done = !item.done;
+        item.doneAt = item.done ? Date.now() : null;
         justToggled = item.id;
         save();
         const { total, done } = stats(list);
@@ -636,6 +669,13 @@
         if (finished) toast(pick(DONE));
         break;
       }
+      case 'repeat':
+        if (!item) return;
+        item.repeat = REPEATS[(REPEATS.indexOf(item.repeat || null) + 1) % REPEATS.length];
+        if (!item.repeat) delete item.repeat;
+        if (item.done && !item.doneAt) item.doneAt = Date.now();
+        save(); render();
+        break;
       case 'del-item':
         if (item) { sec.items = sec.items.filter(i => i !== item); save(); render(); }
         break;
@@ -651,7 +691,8 @@
         list.sections = list.sections.filter(s => s !== sec); save(); render();
         break;
       case 'clear-done':
-        list.sections.forEach(s => { s.items = s.items.filter(i => !i.done); });
+        // repeating items stay; they untick themselves when it's time
+        list.sections.forEach(s => { s.items = s.items.filter(i => !i.done || i.repeat); });
         save(); render();
         break;
       case 'del-list':
@@ -721,6 +762,10 @@
   });
 
   window.addEventListener('hashchange', render);
+  // the installed app can sit open in the background for days
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && resetRepeats()) render();
+  });
 
   const clock = document.getElementById('clock');
   const tick = () => {

@@ -406,6 +406,21 @@ h1, h2, h3 { font-family: var(--hand); font-weight: 400; margin: 0; line-height:
 .item .icon-btn { opacity: 0; transition: opacity .15s; }
 .item:hover .icon-btn, .item:focus-within .icon-btn { opacity: 1; }
 @media (hover: none) { .item .icon-btn { opacity: .55; } }
+.icon-btn svg { width: 16px; height: 16px; }
+.item .rep.on { opacity: 1; color: var(--ink-soft); }
+
+.rep-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 7px;
+  border: 1.2px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  vertical-align: 2px;
+  white-space: nowrap;
+}
 
 .check { flex: none; width: 28px; height: 28px; color: var(--ink); }
 .check svg { width: 100%; height: 100%; overflow: visible; }

@@ -30,6 +30,7 @@ A tiny, doodly list app for groceries, wishlists, to-dos and anything else. It's
 - **Setup steps:** your name, the list's name and its type, then "you're ready".
 - **Hand-drawn feel:** wobbly ink doodles with gentle idle animations, handwritten fonts (Gochi Hand and Patrick Hand), and cards taped on like paper scraps.
 - **A mochi mascot:** it blinks and sways, hops when you add something, and says something nice when you tap it.
+- **Repeating items:** tap the loop icon to make an item daily, weekly or monthly. It unticks itself when it's time to do it again.
 - **Satisfying tick-offs:** a crayon scribble crosses each item out, with small sparkles. Finishing a list gets a bigger burst and a note from the mascot.
 - **Auto stickers:** small line icons appear on items like eggs, meat, ramen, soap, coffee and gifts, and on everyday stuff like workouts, naps, chores, pets, plants, bills… and poop 💩.
 - **Reduced motion:** turns the animations off when your device asks for less motion.
